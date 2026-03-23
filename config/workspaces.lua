@@ -7,10 +7,9 @@ local M = {}
 
 -- ------------------------------------------------------------
 -- Project definitions
--- Each project gets a workspace with a predefined pane layout:
---   - Main pane (left): editor
---   - Right pane: dev server
---   - Bottom-left pane: git / tests / sidecar
+-- Each project gets a workspace with a layout based on whether cwd is a git repo:
+--   Git repo:     left (editor) | top-right (server) | bottom-right (sidecar)
+--   Non-git repo: single pane (editor only)
 -- Add your own projects here.
 -- ------------------------------------------------------------
 
@@ -32,6 +31,11 @@ M.projects = {
 
 local function basename(path)
   return path:match("([^/]+)$") or path
+end
+
+local function is_git_dir(path)
+  local success, _, _ = wezterm.run_child_process({ "test", "-d", path .. "/.git" })
+  return success
 end
 
 function M.workspace_exists(name)
@@ -64,24 +68,27 @@ function M.launch_project_layout(project)
     pane:send_text(table.concat(project.editor, " ") .. "\n")
   end
 
-  -- Right pane: dev server
-  local right = pane:split({
-    direction = "Right",
-    size = 0.34,
-    cwd = project.cwd,
-  })
-  if project.server then
-    right:send_text(table.concat(project.server, " ") .. "\n")
-  end
+  -- Git repos get a split layout; non-git repos stay single pane
+  if is_git_dir(project.cwd) then
+    -- Right pane: dev server
+    local right = pane:split({
+      direction = "Right",
+      size = 0.34,
+      cwd = project.cwd,
+    })
+    if project.server then
+      right:send_text(table.concat(project.server, " ") .. "\n")
+    end
 
-  -- Bottom-left pane: sidecar
-  local bottom = pane:split({
-    direction = "Bottom",
-    size = 0.28,
-    cwd = project.cwd,
-  })
-  if project.sidecar then
-    bottom:send_text(table.concat(project.sidecar, " ") .. "\n")
+    -- Bottom-right pane: sidecar
+    local bottom_right = right:split({
+      direction = "Bottom",
+      size = 0.40,
+      cwd = project.cwd,
+    })
+    if project.sidecar then
+      bottom_right:send_text(table.concat(project.sidecar, " ") .. "\n")
+    end
   end
 
   mux.set_active_workspace(project.workspace)

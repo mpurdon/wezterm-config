@@ -30,7 +30,7 @@ A modular WezTerm configuration with tmux-style keybindings, project workspaces,
 - Right status bar: workspace name icon + clock
 
 ### Fonts
-- **JetBrains Mono** (Medium) as the primary font
+- **Comic Code Ligatures** (Medium) as the primary font — programming ligatures enabled
 - **Symbols Nerd Font Mono** for icon fallback
 - **Apple Color Emoji** for emoji
 - Explicit bold and bold-italic font rules
@@ -47,19 +47,21 @@ A modular WezTerm configuration with tmux-style keybindings, project workspaces,
 - No update checks, no missing glyph warnings
 
 ### Project Workspaces
-Define projects in `config/workspaces.lua` to get a predefined pane layout per project:
+Define projects in `config/workspaces.lua`. The pane layout is **dynamic** — it detects whether the project directory is a git repository:
+
+**Git repo** — 3-pane split:
 
 ```
 ┌──────────────────┬──────────┐
-│                  │          │
-│     Editor       │  Server  │
-│   (66% width)    │  (34%)   │
-│                  │          │
-├──────────────────┤          │
-│    Sidecar       │          │
-│   (28% height)   │          │
+│                  │  Server  │
+│                  │  (34%)   │
+│     Editor       ├──────────┤
+│   (66% width)    │ Sidecar  │
+│                  │  (40%)   │
 └──────────────────┴──────────┘
 ```
+
+**Non-git directory** — single pane (editor only)
 
 Example project definition:
 
@@ -156,5 +158,5 @@ The **leader key** is `Ctrl-A` (1200ms timeout). Pressing the leader activates a
 ## Requirements
 
 - [WezTerm](https://wezfurlong.org/wezterm/) (nightly or recent stable)
-- [JetBrains Mono](https://www.jetbrains.com/lp/mono/) font
+- [Comic Code Ligatures](https://tosche.net/fonts/comic-code) font
 - [Symbols Nerd Font Mono](https://www.nerdfonts.com/) for icons

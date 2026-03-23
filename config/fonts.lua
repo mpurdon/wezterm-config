@@ -4,7 +4,7 @@ local M = {}
 
 function M.apply(config)
   config.font = wezterm.font_with_fallback({
-    { family = "JetBrains Mono", weight = "Medium" },
+    { family = "Comic Code Ligatures", weight = "Medium" },
     { family = "Symbols Nerd Font Mono" },
     "Apple Color Emoji",
   })
@@ -17,14 +17,14 @@ function M.apply(config)
       intensity = "Bold",
       italic = false,
       font = wezterm.font_with_fallback({
-        { family = "JetBrains Mono", weight = "Bold" },
+        { family = "Comic Code Ligatures", weight = "Bold" },
       }),
     },
     {
       intensity = "Bold",
       italic = true,
       font = wezterm.font_with_fallback({
-        { family = "JetBrains Mono", weight = "Bold", italic = true },
+        { family = "Comic Code Ligatures", weight = "Bold", italic = true },
       }),
     },
   }

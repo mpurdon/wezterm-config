@@ -7,18 +7,6 @@ local workspaces = require("config.workspaces")
 local M = {}
 
 function M.setup()
-  -- Dynamically switch color scheme when system appearance changes
-  wezterm.on("window-config-reloaded", function(window, _pane)
-    local overrides = window:get_config_overrides() or {}
-    local appearance = window:get_appearance()
-    local scheme = colors.scheme_for_appearance(appearance)
-
-    if overrides.color_scheme ~= scheme then
-      overrides.color_scheme = scheme
-      window:set_config_overrides(overrides)
-    end
-  end)
-
   -- Right status: workspace name + time
   wezterm.on("update-right-status", function(window, _pane)
     local workspace = window:active_workspace()
@@ -37,13 +25,13 @@ function M.setup()
 
   -- Dynamic window title: workspace — cwd
   wezterm.on("format-window-title", function(tab, pane, _tabs, _panes, _config, _hover, _max_width)
-    local cwd_uri = pane:get_current_working_dir()
+    local cwd_uri = pane.current_working_dir
     local cwd = ""
     if cwd_uri then
       cwd = cwd_uri.file_path or cwd_uri.path or ""
     end
     local name = cwd ~= "" and workspaces.basename(cwd) or "shell"
-    local ws = tab:get_workspace()
+    local ws = mux.get_active_workspace()
     return string.format("%s — %s", ws, name)
   end)
 
