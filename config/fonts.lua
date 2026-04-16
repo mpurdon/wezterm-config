@@ -11,6 +11,7 @@ function M.apply(config)
   config.font_size = 14.0
   config.line_height = 1.2
   config.cell_width = 1.0
+  config.command_palette_font_size = 14.0
 
   config.font_rules = {
     {

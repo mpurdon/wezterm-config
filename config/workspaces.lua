@@ -5,25 +5,7 @@ local home = wezterm.home_dir
 
 local M = {}
 
--- ------------------------------------------------------------
--- Project definitions
--- Each project gets a workspace with a layout based on whether cwd is a git repo:
---   Git repo:     left (editor) | top-right (server) | bottom-right (sidecar)
---   Non-git repo: single pane (editor only)
--- Add your own projects here.
--- ------------------------------------------------------------
-
-M.projects = {
-  -- Example project (uncomment and customise):
-  -- myapp = {
-  --   label = "My App",
-  --   workspace = "myapp",
-  --   cwd = home .. "/code/myapp",
-  --   editor = { "nvim", "." },
-  --   server = { "pnpm", "dev" },
-  --   sidecar = { "git", "status" },
-  -- },
-}
+M.projects = require("config.projects")
 
 -- ------------------------------------------------------------
 -- Helpers
@@ -58,36 +40,57 @@ function M.switch_or_create(name, cwd)
 end
 
 function M.launch_project_layout(project)
-  local _tab, pane, _window = mux.spawn_window({
+  local _tab, first_pane, _window = mux.spawn_window({
     workspace = project.workspace,
     cwd = project.cwd,
   })
 
-  -- Main pane: editor
-  if project.editor then
-    pane:send_text(table.concat(project.editor, " ") .. "\n")
-  end
+  if project.layout then
+    -- Custom layout: each entry defines a pane
+    local panes = { first_pane }
 
-  -- Git repos get a split layout; non-git repos stay single pane
-  if is_git_dir(project.cwd) then
-    -- Right pane: dev server
-    local right = pane:split({
-      direction = "Right",
-      size = 0.34,
-      cwd = project.cwd,
-    })
-    if project.server then
-      right:send_text(table.concat(project.server, " ") .. "\n")
+    for i, entry in ipairs(project.layout) do
+      if i == 1 then
+        if entry.cmd then
+          first_pane:send_text(table.concat(entry.cmd, " ") .. "\n")
+        end
+      else
+        local parent = panes[entry.split_from or (i - 1)]
+        local new_pane = parent:split({
+          direction = entry.direction or "Right",
+          size = entry.size or 0.5,
+          cwd = entry.cwd or project.cwd,
+        })
+        if entry.cmd then
+          new_pane:send_text(table.concat(entry.cmd, " ") .. "\n")
+        end
+        table.insert(panes, new_pane)
+      end
+    end
+  else
+    -- Simple format: editor | server | sidecar (auto-layout)
+    if project.editor then
+      first_pane:send_text(table.concat(project.editor, " ") .. "\n")
     end
 
-    -- Bottom-right pane: sidecar
-    local bottom_right = right:split({
-      direction = "Bottom",
-      size = 0.40,
-      cwd = project.cwd,
-    })
-    if project.sidecar then
-      bottom_right:send_text(table.concat(project.sidecar, " ") .. "\n")
+    if is_git_dir(project.cwd) then
+      local right = first_pane:split({
+        direction = "Right",
+        size = 0.34,
+        cwd = project.cwd,
+      })
+      if project.server then
+        right:send_text(table.concat(project.server, " ") .. "\n")
+      end
+
+      local bottom_right = right:split({
+        direction = "Bottom",
+        size = 0.40,
+        cwd = project.cwd,
+      })
+      if project.sidecar then
+        bottom_right:send_text(table.concat(project.sidecar, " ") .. "\n")
+      end
     end
   end
 
