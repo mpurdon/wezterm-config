@@ -2,7 +2,7 @@ local M = {}
 
 function M.apply(config)
 	-- Window
-	config.window_decorations = "RESIZE"
+	config.window_decorations = "TITLE | RESIZE"
 	config.window_padding = { left = 8, right = 8, top = 8, bottom = 8 }
 	config.initial_cols = 120
 	config.initial_rows = 36

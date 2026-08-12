@@ -11,8 +11,9 @@ M.projects = require("config.projects")
 -- Helpers
 -- ------------------------------------------------------------
 
-local function basename(path)
-  return path:match("([^/]+)$") or path
+function M.basename(path)
+  local trimmed = path:gsub("/+$", "")
+  return trimmed:match("([^/]+)$") or trimmed
 end
 
 local function is_git_dir(path)
@@ -109,10 +110,6 @@ function M.project_choices()
     return a.label < b.label
   end)
   return choices
-end
-
-function M.basename(path)
-  return basename(path)
 end
 
 -- ------------------------------------------------------------
