@@ -107,4 +107,13 @@ return {
     server = { "iex", "-S", "mix", "phx.server" },
     sidecar = { "git", "status" },
   },
+
+  iforisla = {
+    label = "I for Isla",
+    workspace = "iforisla",
+    cwd = home .. "/Projects/iforisla.com",
+    editor = { "claude" },
+    server = { "bun", "run", "dev" },
+    sidecar = { "git", "status" },
+  },
 }
