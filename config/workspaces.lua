@@ -5,7 +5,19 @@ local home = wezterm.home_dir
 
 local M = {}
 
-M.projects = require("config.projects")
+-- config/projects.lua holds the real project list and is gitignored; fall back to
+-- the checked-in template so a fresh clone loads without it.
+local ok, projects = pcall(require, "config.projects")
+if not ok then
+  -- Only a missing file falls back; a broken projects.lua should still be loud.
+  if not tostring(projects):match("module '[^']*' not found") then
+    error(projects, 0)
+  end
+  wezterm.log_info("no config/projects.lua; using config/projects_example.lua")
+  projects = require("config.projects_example")
+end
+
+M.projects = projects
 
 -- ------------------------------------------------------------
 -- Helpers

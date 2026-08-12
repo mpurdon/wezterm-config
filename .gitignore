@@ -1,1 +1,4 @@
 .DS_Store
+
+# Local project definitions (real paths); see config/projects_example.lua
+config/projects.lua
