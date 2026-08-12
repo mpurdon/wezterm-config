@@ -14,7 +14,8 @@ A modular WezTerm configuration with tmux-style keybindings, project workspaces,
     ├── colors.lua       # Color scheme, chrome palette, opacity, pane dimming
     ├── themes.lua       # Per-window color scheme cycling
     ├── tabs.lua         # Tab bar appearance and colors
-    ├── projects.lua     # Project definitions (cwd + pane layout per workspace)
+    ├── projects_example.lua  # Project definition template (committed)
+    ├── projects.lua     # Your project definitions (gitignored)
     ├── workspaces.lua   # Workspace helpers, project launcher, launch menu
     └── events.lua       # Event handlers (startup, status bar, titles, pickers)
 ```
@@ -49,7 +50,13 @@ A modular WezTerm configuration with tmux-style keybindings, project workspaces,
 - No update checks, no missing glyph warnings
 
 ### Project Workspaces
-Define projects in `config/projects.lua`. Each project gets its own workspace. With the simple format the pane layout is **dynamic** — it detects whether the project directory is a git repository:
+Define projects in `config/projects.lua`. That file is **gitignored** so local paths and
+private project names stay out of the repo — copy `config/projects_example.lua` to
+`config/projects.lua` to get started. If it is missing, the example is used as a fallback
+and the project picker simply comes up empty.
+
+Each project gets its own workspace. With the simple format the pane layout is
+**dynamic** — it detects whether the project directory is a git repository:
 
 **Git repo** — 3-pane split:
 
