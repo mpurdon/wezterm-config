@@ -1,6 +1,6 @@
 # WezTerm Configuration
 
-A modular WezTerm configuration with tmux-style keybindings, project workspaces, and automatic dark/light mode switching.
+A modular WezTerm configuration with tmux-style keybindings, project workspaces, and per-window theme cycling.
 
 ## File Structure
 
@@ -11,23 +11,25 @@ A modular WezTerm configuration with tmux-style keybindings, project workspaces,
     ├── options.lua      # Window, shell, cursor, scrollback, performance
     ├── keys.lua         # Leader key, keybindings, mouse bindings
     ├── fonts.lua        # Font family, size, rendering rules
-    ├── colors.lua       # Color scheme, opacity, inactive pane dimming
+    ├── colors.lua       # Color scheme, chrome palette, opacity, pane dimming
+    ├── themes.lua       # Per-window color scheme cycling
     ├── tabs.lua         # Tab bar appearance and colors
-    ├── workspaces.lua   # Project definitions, workspace helpers, launch menu
+    ├── projects.lua     # Project definitions (cwd + pane layout per workspace)
+    ├── workspaces.lua   # Workspace helpers, project launcher, launch menu
     └── events.lua       # Event handlers (startup, status bar, titles, pickers)
 ```
 
 ## Features
 
 ### Appearance
-- **Catppuccin Mocha** (dark) / **Catppuccin Latte** (light) — switches automatically with macOS system appearance
+- **Catppuccin Mocha** by default; cycle through alternate schemes per window with `Ctrl-A` `Shift+T`
 - Transparent background (95% opacity) with macOS background blur
-- Retro-style tab bar at the bottom with Catppuccin-matched colors
-- Tab bar auto-hides when only one tab is open
+- Retro-style tab bar pinned to the bottom, always visible
+- Tab bar and status line share a fixed chrome palette (`colors.lua`), so they stay put while cycling themes
 - Inactive panes are dimmed (reduced saturation and brightness)
-- Clean window chrome — title bar removed, resize-only decorations
-- Dynamic window title: `workspace — directory`
-- Right status bar: workspace name icon + clock
+- Native title bar with resize handles
+- Window title: the current project (workspace project → git repo → directory name)
+- Left status: current project. Right status: workspace icon + clock
 
 ### Fonts
 - **Comic Code Ligatures** (Medium) as the primary font — programming ligatures enabled
@@ -47,7 +49,7 @@ A modular WezTerm configuration with tmux-style keybindings, project workspaces,
 - No update checks, no missing glyph warnings
 
 ### Project Workspaces
-Define projects in `config/workspaces.lua`. The pane layout is **dynamic** — it detects whether the project directory is a git repository:
+Define projects in `config/projects.lua`. Each project gets its own workspace. With the simple format the pane layout is **dynamic** — it detects whether the project directory is a git repository:
 
 **Git repo** — 3-pane split:
 
@@ -66,17 +68,19 @@ Define projects in `config/workspaces.lua`. The pane layout is **dynamic** — i
 Example project definition:
 
 ```lua
-M.projects = {
-  myapp = {
-    label = "My App",
-    workspace = "myapp",
-    cwd = home .. "/code/myapp",
-    editor = { "nvim", "." },
-    server = { "pnpm", "dev" },
-    sidecar = { "git", "status" },
-  },
-}
+myapp = {
+  label = "My App",
+  workspace = "myapp",
+  cwd = home .. "/code/myapp",
+  editor = { "nvim", "." },
+  server = { "pnpm", "dev" },
+  sidecar = { "git", "status" },
+},
 ```
+
+For full control, use `layout` instead of `editor`/`server`/`sidecar` — an array of pane
+definitions with `cmd`, `direction`, `size`, `cwd`, and `split_from`. See the comments at
+the top of `config/projects.lua`.
 
 ### Launch Menu
 Available via the command palette or launcher:
@@ -148,6 +152,13 @@ The **leader key** is `Ctrl-A` (1200ms timeout). Pressing the leader activates a
 |---|---|
 | `Ctrl-A` `f` | Search (case-insensitive) |
 | `Ctrl-A` `Space` | Quick select (URLs, hashes, paths) |
+
+### Theme (leader)
+
+| Keys | Action |
+|---|---|
+| `Ctrl-A` `Shift+T` | Cycle color scheme for this window |
+| `Ctrl-A` `Backspace` | Reset this window to the default scheme |
 
 ### Pass-through
 
